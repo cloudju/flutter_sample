@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_samples/service/home_page_service.dart';
+import 'package:flutter_samples/view_model/home_page_view_model.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -17,7 +20,15 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Text('nothing'),
+        child: Consumer<HomePageViewModel>(
+          builder: (context, viewModel, child) => ListView(
+            children: viewModel.datas
+                .map(
+                  (e) => Text(e),
+                )
+                .toList(),
+          ),
+        ),
       ),
     );
   }
