@@ -21,13 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Consumer<HomePageViewModel>(
-          builder: (context, viewModel, child) => ListView(
-            children: viewModel.datas
-                .map(
-                  (e) => Text(e),
-                )
-                .toList(),
-          ),
+          builder: (context, viewModel, child) => viewModel.listView(context),
         ),
       ),
     );
