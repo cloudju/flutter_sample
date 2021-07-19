@@ -4,6 +4,18 @@ import 'package:provider/provider.dart';
 
 typedef ValueBuilder<T> = T Function(BuildContext context);
 
+class SimpleNavigator<T extends ViewModel> {
+  SimpleNavigator({
+    required this.pageName,
+    required this.page,
+    required this.viewModelBuilder,
+  });
+
+  final String pageName;
+  final Widget page;
+  final ValueBuilder<T> viewModelBuilder;
+}
+
 class CustomNavigator {
   Future<void> push<T extends ViewModel>({
     required BuildContext context,

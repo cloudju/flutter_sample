@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_samples/service/home_page_service.dart';
 import 'package:flutter_samples/service/service.dart';
 import 'package:flutter_samples/utils/CustomNavigator.dart';
-import 'package:flutter_samples/view/empty_page.dart';
-import 'package:flutter_samples/view_model/empty_page_view_model.dart';
 import 'package:flutter_samples/view_model/view_model.dart';
 
 class HomePageViewModel extends ViewModel {
@@ -20,12 +18,12 @@ class HomePageViewModel extends ViewModel {
               (e) => Center(
                 child: Container(
                   child: ElevatedButton(
-                    child: Text(e),
+                    child: Text(e.pageName),
                     onPressed: () {
                       CustomNavigator().push(
                         context: context,
-                        nextPage: EmptyPage(),
-                        viewModelBuilder: (_) => EmptyPageViewModel(),
+                        nextPage: e.page,
+                        viewModelBuilder: e.viewModelBuilder,
                       );
                     },
                   ),
