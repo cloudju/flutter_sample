@@ -7,21 +7,27 @@ import 'package:flutter_samples/view_model/animation_samples_view_model.dart';
 import 'package:flutter_samples/view_model/empty_page_view_model.dart';
 
 class HomePageService extends Service {
-  final List<SimpleNavigator> menu = [
-    SimpleNavigator<EmptyPageViewModel>(
-      pageName: '横向入场',
-      page: EmptyPage(),
-      viewModelBuilder: (_) => EmptyPageViewModel(),
-    ),
-    SimpleNavigator<EmptyPageViewModel>(
-      pageName: '纵向入场',
-      page: EmptyPage(),
-      viewModelBuilder: (_) => EmptyPageViewModel(),
-    ),
-    SimpleNavigator<AnimationSamplesViewModel>(
-      pageName: '纵向入场',
-      page: AnimationSamplesPage(),
-      viewModelBuilder: (_) => AnimationSamplesViewModel(),
-    ),
-  ];
+  final Map<String, void Function(BuildContext)> menu = {
+    '横向入场': (context) {
+      CustomNavigator().push(
+        context: context,
+        nextPage: EmptyPage(),
+        viewModelBuilder: (_) => EmptyPageViewModel(),
+      );
+    },
+    '纵向入场': (context) {
+      CustomNavigator().push(
+        context: context,
+        nextPage: EmptyPage(),
+        viewModelBuilder: (_) => EmptyPageViewModel(),
+      );
+    },
+    '动画演示': (context) {
+      CustomNavigator().push(
+        context: context,
+        nextPage: AnimationSamplesPage(),
+        viewModelBuilder: (_) => AnimationSamplesViewModel(),
+      );
+    },
+  };
 }
