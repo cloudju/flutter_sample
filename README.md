@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+## Tips
+- [如何在Flutter调用ios原生代码](doc/call_ios_navite_code_in_flutter.md)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

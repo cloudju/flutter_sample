@@ -7,7 +7,9 @@ class IosNativePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('调用iosNative功能'),
       ),
-      body: Container(),
+      body: Container(
+        child: UiKitView(viewType: "FlutterCallableView"),
+      ),
     );
   }
 }

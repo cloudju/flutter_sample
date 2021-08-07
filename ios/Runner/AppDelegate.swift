@@ -8,6 +8,10 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+    
+    //注册flutter控件
+    FlutterCallableViewPlugin.registerWith(registry:  self)
+    
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
