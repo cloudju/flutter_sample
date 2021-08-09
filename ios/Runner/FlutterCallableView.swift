@@ -14,18 +14,39 @@ class FlutterCallableView : NSObject,FlutterPlatformView{
     let viewId: Int64;
     var messenger: FlutterBinaryMessenger!
     
-    init(_ frame: CGRect,viewID: Int64,args :Any?, binaryMessenger: FlutterBinaryMessenger) {
+    var content :String?
+    
+    init(_ frame: CGRect,
+         viewID: Int64,
+         args :Any?,
+         binaryMessenger: FlutterBinaryMessenger) {
+        
         self.frame = frame;
         self.viewId = viewID;
         self.messenger=binaryMessenger;
-        print("!!!!!!!!!!!!!!!from flutter call a view build by swift!!!!!!!!!!!!!!!!!!\(frame)");
+        if let arg = args as? [String : String],
+           let content = arg["content"]{
+            self.content = content
+            print("!!content: \(String(content))")
+        }
     }
     
     func view() -> UIView {
-        let mapView = UILabel()
-        mapView.text="这段代码是在ios原生中运行的。"
-        mapView.frame = frame
-        return mapView;
+        let view = UIView(frame: frame)
+        view.backgroundColor = .red
+        
+        let label = UILabel()
+        label.backgroundColor = .blue
+        label.text="这段代码是在ios原生中运行的。"
+        label.frame = CGRect(x: 0, y: 0, width: 200, height: 100)
+        view.addSubview(label)
+        
+        let label2 = UILabel()
+        label2.backgroundColor = .green
+        label2.text=self.content ?? "无法取得输入"
+        label2.frame = CGRect(x: 0, y: 100, width: 200, height: 100)
+        view.addSubview(label2)
+        return view;
     }
 }
 
@@ -36,6 +57,10 @@ class FlutterCallableViewFactory : NSObject,FlutterPlatformViewFactory{
     
     func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
         return FlutterCallableView(frame,viewID : viewId , args : args,binaryMessenger:messenger);
+    }
+    
+    func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+        return FlutterStandardMessageCodec.sharedInstance()
     }
     
     @objc public init(messenger: (NSObject & FlutterBinaryMessenger)?) {
