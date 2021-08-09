@@ -9,7 +9,7 @@ import Flutter
 import Foundation
 
 // 实际在Flutter中被调用的类
-class FlutterCallableView : NSObject,FlutterPlatformView{
+class FlutterCallableView : NSObject,FlutterPlatformView, UNUserNotificationCenterDelegate{
     let frame: CGRect;
     let viewId: Int64;
     var messenger: FlutterBinaryMessenger!
@@ -29,6 +29,71 @@ class FlutterCallableView : NSObject,FlutterPlatformView{
             self.content = content
             print("!!content: \(String(content))")
         }
+        super.init()
+        
+        if #available(iOS 10.0, *) {
+            let center = UNUserNotificationCenter.current()
+            center.delegate = self
+        }
+    }
+    
+    @available(iOS 10.0, *)
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        print("APP处于前台时接受到通知时被调用.\(requestType(notification))")
+        
+        completionHandler([.sound, .alert])
+    }
+    
+    @available(iOS 10.0, *)
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("打开通知时被调用。\(requestType(response.notification))")
+        completionHandler()
+    }
+    
+    @available(iOS 10.0, *)
+    func requestType(_ notification:UNNotification)->String{
+        switch notification.request.trigger{
+        case is UNPushNotificationTrigger:
+            return "プッシュ通知受信"
+        case is UNTimeIntervalNotificationTrigger:
+            return "タイマー通知受信"
+        case is UNCalendarNotificationTrigger:
+            return "カレンダー通知受信"
+        case is UNLocationNotificationTrigger:
+            return "ロケーション通知受信"
+        case .none:
+            return "(.none)通知受信"
+        case .some(_):
+            return "(.some)通知受信"
+        }
+    }
+    
+    @available(iOS 10.0, *)
+    @objc func timerNotification(){
+        let content = UNMutableNotificationContent()
+        
+        content.title = "Title"
+        content.subtitle = "Subtitle" // 新登場！
+        content.body = "Body"
+        content.sound = UNNotificationSound.default
+
+        // 5秒後に発火
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(identifier: "FiveSecond",
+                                           content: content,
+                                           trigger: trigger)
+
+        // ローカル通知予約
+        UNUserNotificationCenter.current().add(request){_ in
+            print("ローカル通知予約 complet")
+        }
     }
     
     func view() -> UIView {
@@ -46,6 +111,18 @@ class FlutterCallableView : NSObject,FlutterPlatformView{
         label2.text=self.content ?? "无法取得输入"
         label2.frame = CGRect(x: 0, y: 100, width: 200, height: 100)
         view.addSubview(label2)
+        
+        let btn = UIButton(frame: CGRect(x: 0, y: 200, width: 200, height: 100))
+        btn.backgroundColor = .cyan
+
+        if #available(iOS 10.0, *) {
+            btn.setTitle("5秒后通知", for: .normal)
+            btn.addTarget(self, action: #selector(timerNotification), for: .touchUpInside)
+        } else {
+            btn.setTitle("ios 10.0 以后的版本才能运行", for: .normal)
+        }
+        view.addSubview(btn)
+        
         return view;
     }
 }
