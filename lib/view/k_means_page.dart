@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_samples/utils/CustomNavigator.dart';
 import 'package:flutter_samples/view_model/k_means_view_model.dart';
+import 'package:flutter_samples/widget/draw_point_widget.dart';
 import 'package:provider/provider.dart';
 
 class KMeansPage extends StatelessWidget {
@@ -10,7 +11,12 @@ class KMeansPage extends StatelessWidget {
       appBar: AppBar(),
       body: Center(
         child: Consumer<KMeansViewModel>(
-          builder: (context, viewModel, child) => Text('${viewModel.name}'),
+          builder: (context, viewModel, child) => DrawPointWidget(
+            drawOnly: false,
+            onPointsUpdate: (points) {
+              print(points.length);
+            },
+          ),
         ),
       ),
     );
