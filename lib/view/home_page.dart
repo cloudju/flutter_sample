@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_samples/service/home_page_service.dart';
 import 'package:flutter_samples/view_model/home_page_view_model.dart';
 import 'package:provider/provider.dart';
 

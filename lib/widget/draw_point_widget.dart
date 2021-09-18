@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class DrawPointWidget extends StatefulWidget {
   DrawPointWidget({
+    required this.size,
     this.onPointsUpdate,
     this.points,
     this.drawOnly = true,
@@ -9,10 +10,12 @@ class DrawPointWidget extends StatefulWidget {
   final void Function(List<Offset>)? onPointsUpdate;
   final List<Offset>? points;
   final bool drawOnly;
+  final Size size;
 
   @override
   State<StatefulWidget> createState() {
     return _DrawPointState(
+      size: size,
       drawOnly: drawOnly,
       points: points ?? [],
     );
@@ -21,18 +24,22 @@ class DrawPointWidget extends StatefulWidget {
 
 class _DrawPointState extends State<DrawPointWidget> {
   _DrawPointState({
+    required this.size,
     required this.drawOnly,
     required this.points,
   });
   List<Offset> points = [];
   final bool drawOnly;
+  final Size size;
 
   @override
   Widget build(BuildContext context) => Container(
-        color: null,
+        width: size.width,
+        height: size.height,
         child: Stack(
           children: [
             CustomPaint(
+              size: size,
               painter: OpenPainter(points: points),
             ),
             if (!drawOnly)
