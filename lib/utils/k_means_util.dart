@@ -22,9 +22,9 @@ class KMeans {
   late final List<Member> members;
   final int num;
 
-  List<List<Offset>> _result = [];
+  Map<Offset, List<Offset>> _result = {};
 
-  List<List<Offset>> caculate() {
+  Map<Offset, List<Offset>> caculate() {
     if (_result.isNotEmpty) {
       return _result;
     }
@@ -63,15 +63,18 @@ class KMeans {
 
   /// 从[clusters]提取结果
   void makeResult(Map<Uuid, Cluster> clusters) {
-    _result = clusters.entries
-        .map(
-          (c) => c.value.members
-              .map(
-                (m) => Offset(m.pt.dx, m.pt.dy),
-              )
-              .toList(),
-        )
-        .toList();
+    // _result = clusters.entries
+    //     .map(
+    //       (c) => c.value.members
+    //           .map(
+    //             (m) => Offset(m.pt.dx, m.pt.dy),
+    //           )
+    //           .toList(),
+    //     )
+    //     .toList();
+    clusters.entries.forEach((e) {
+      _result[e.value.center] = e.value.members.map((m) => m.pt).toList();
+    });
   }
 
   /// 比较两个Cluster列表的成员是否一致。

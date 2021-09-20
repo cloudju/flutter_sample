@@ -28,12 +28,21 @@ class KMeansPage extends StatelessWidget {
         MediaQuery.of(context).padding.vertical;
     return Column(
       children: [
-        DrawPointWidget(
-          size: Size(_width, _height * 0.9),
-          drawOnly: false,
-          onPointsUpdate: (points) {
-            viewModel.points = points;
-          },
+        Stack(
+          children: [
+            DrawPointWidget(
+              size: Size(_width, _height * 0.9),
+              drawOnly: false,
+              onPointsUpdate: (points) {
+                viewModel.points = points;
+              },
+            ),
+            if (viewModel.result != null)
+              viewModel.resultWigdet(
+                viewModel.result!,
+                Size(_width, _height * 0.9),
+              )
+          ],
         ),
         Container(
           child: Row(
@@ -43,6 +52,13 @@ class KMeansPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: viewModel.run,
                   child: Text('start'),
+                ),
+              ),
+              Container(
+                color: Colors.blue,
+                child: TextButton(
+                  onPressed: viewModel.clear,
+                  child: Text('clear'),
                 ),
               ),
             ],
