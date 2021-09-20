@@ -4,15 +4,10 @@ import 'package:flutter_samples/view_model/k_means_view_model.dart';
 import 'package:flutter_samples/widget/draw_point_widget.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class KMeansPage extends StatelessWidget {
-  late final double _height;
-  late final double _width;
   @override
   Widget build(BuildContext context) {
-    _width = MediaQuery.of(context).size.width;
-    _height = MediaQuery.of(context).size.height -
-        kToolbarHeight -
-        MediaQuery.of(context).padding.vertical;
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
@@ -27,17 +22,31 @@ class KMeansPage extends StatelessWidget {
   }
 
   Widget _body(BuildContext context, KMeansViewModel viewModel, Widget? child) {
+    final _width = MediaQuery.of(context).size.width;
+    final _height = MediaQuery.of(context).size.height -
+        kToolbarHeight -
+        MediaQuery.of(context).padding.vertical;
     return Column(
       children: [
         DrawPointWidget(
           size: Size(_width, _height * 0.9),
           drawOnly: false,
           onPointsUpdate: (points) {
-            print(points.length);
+            viewModel.points = points;
           },
         ),
         Container(
-          height: _height * 0.1,
+          child: Row(
+            children: [
+              Container(
+                color: Colors.amber,
+                child: TextButton(
+                  onPressed: viewModel.run,
+                  child: Text('start'),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
