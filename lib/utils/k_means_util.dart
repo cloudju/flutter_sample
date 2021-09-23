@@ -1,11 +1,14 @@
-import 'package:flutter/painting.dart';
-import 'dart:math';
-
 import 'package:uuid/uuid.dart';
 
-class KMeans {
+abstract class KMeansItem<T> {
+  double distance(T item);
+  bool compare(List<T> list1, List<T> list2);
+  T average(List<T> list);
+}
+
+class KMeans<T extends KMeansItem> {
   KMeans({
-    required List<Offset> points,
+    required List<T> points,
     required this.num,
   }) {
     members = [];
@@ -19,26 +22,26 @@ class KMeans {
       );
     }
   }
-  late final List<Member> members;
+  late final List<Member<T>> members;
   final int num;
 
-  Map<Offset, List<Offset>> _result = {};
+  Map<T, List<T>> _result = {};
 
-  Map<Offset, List<Offset>> caculate() {
+  Map<T, List<T>> caculate() {
     if (_result.isNotEmpty) {
       return _result;
     }
 
     // 2.从数据集中随机选取 k 个数据点作为质心并生成group
-    Map<Uuid, Cluster> tmpClusters = _makeKList();
+    Map<Uuid, Cluster<T>> tmpClusters = _makeKList();
 
     bool finish = false;
     do {
       /// 3.计算[points]与每一个质心的距离。并将该point加入距离最近的Group
-      Map<Uuid, Cluster> clusters = grouping(tmpClusters);
+      Map<Uuid, Cluster<T>> clusters = grouping(tmpClusters);
 
       /// 4. 更新质心
-      Map<Uuid, Cluster> newClusters = regrouping(clusters);
+      Map<Uuid, Cluster<T>> newClusters = regrouping(clusters);
 
       /// 5. 按每个[point]和新质心的距离，从新分组。
       newClusters = grouping(newClusters);
@@ -62,7 +65,7 @@ class KMeans {
   }
 
   /// 从[clusters]提取结果
-  void makeResult(Map<Uuid, Cluster> clusters) {
+  void makeResult(Map<Uuid, Cluster<T>> clusters) {
     // _result = clusters.entries
     //     .map(
     //       (c) => c.value.members
@@ -99,8 +102,8 @@ class KMeans {
   }
 
   /// 2.从数据集中随机选取 k 个数据点作为质心；
-  Map<Uuid, Cluster> _makeKList() {
-    Map<Uuid, Cluster> result = {};
+  Map<Uuid, Cluster<T>> _makeKList() {
+    Map<Uuid, Cluster<T>> result = {};
     members.sublist(0, num).forEach(
       (m) {
         result[Uuid()] = Cluster(m.pt);
@@ -111,14 +114,14 @@ class KMeans {
 
   /// 3.计算[points]与每一个质心的距离。
   /// 并加入最近的那个质心的[cluster]
-  Map<Uuid, Cluster> grouping(Map<Uuid, Cluster> clusters) {
+  Map<Uuid, Cluster<T>> grouping(Map<Uuid, Cluster<T>> clusters) {
     members.forEach(
       (m) {
         double distance = double.infinity;
         Uuid clusterId = clusters.entries.first.key;
         clusters.forEach(
           (uuid, c) {
-            double thisDistance = _distance(m.pt, c.center);
+            double thisDistance = m.pt.distance(c.center);
             if (thisDistance < distance) {
               distance = thisDistance;
               clusterId = uuid;
@@ -133,36 +136,38 @@ class KMeans {
   }
 
   ///
-  double _distance(Offset pt1, Offset pt2) {
-    final xx = (double x) => x * x;
-    return sqrt(xx(pt1.dx - pt2.dx) + xx(pt1.dy - pt2.dy));
-  }
+//   double _distance(Offset pt1, Offset pt2) {
+//     final xx = (double x) => x * x;
+//     return sqrt(xx(pt1.dx - pt2.dx) + xx(pt1.dy - pt2.dy));
+//   }
 
   /// 4. 选出新的质心
-  Map<Uuid, Cluster> regrouping(Map<Uuid, Cluster> clusters) {
-    Map<Uuid, Cluster> newClusters = {};
+  Map<Uuid, Cluster<T>> regrouping(Map<Uuid, Cluster<T>> clusters) {
+    Map<Uuid, Cluster<T>> newClusters = {};
     clusters.forEach(
       (key, c) {
-        double dx = 0.0;
-        double dy = 0.0;
+        // double dx = 0.0;
+        // double dy = 0.0;
 
-        c.members.forEach((m) {
-          dx += m.pt.dx;
-          dy += m.pt.dy;
-        });
-        newClusters[key] = Cluster(
-          Offset(
-            dx / c.members.length,
-            dy / c.members.length,
-          ),
-        );
+        // c.members.forEach((m) {
+        //   dx += m.pt.dx;
+        //   dy += m.pt.dy;
+        // });
+        // newClusters[key] = Cluster(
+        //   Offset(
+        //     dx / c.members.length,
+        //     dy / c.members.length,
+        //   ),
+        // );
+        newClusters[key] =
+            Cluster(c.center.average(c.members.map((e) => e.pt).toList()));
       },
     );
     return newClusters;
   }
 }
 
-class Member {
+class Member<T extends KMeansItem> {
   Member({
     required this.id,
     required this.pt,
@@ -170,36 +175,36 @@ class Member {
   });
 
   int id;
-  Offset pt;
+  T pt;
   double distance;
 }
 
-class Cluster {
+class Cluster<T extends KMeansItem> {
   Cluster(this.center);
 
   /// 质心
-  Offset center;
-  List<Member> members = [];
-  void add(Member menber) {
+  T center;
+  List<Member<T>> members = [];
+  void add(Member<T> menber) {
     members.add(menber);
   }
 
-  /// 用所有成员xy的平均值，计算出新的中心点
-  Offset caculateAveragePoint() {
-    return Offset(0, 0);
-  }
+//   /// 用所有成员xy的平均值，计算出新的中心点
+//   T caculateAveragePoint() {
+//     return Offset(0, 0);
+//   }
 
-  int maxMember() {
-    int xx = 0;
-    members.forEach((m) {
-      if (m.id > xx) {
-        xx = m.id;
-      }
-    });
-    return xx;
-  }
+//   int maxMember() {
+//     int xx = 0;
+//     members.forEach((m) {
+//       if (m.id > xx) {
+//         xx = m.id;
+//       }
+//     });
+//     return xx;
+//   }
 
-  bool compare(Cluster cluster) {
+  bool compare(Cluster<T> cluster) {
     if (members.length != cluster.members.length) {
       return false;
     }

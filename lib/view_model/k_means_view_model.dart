@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter_samples/utils/custom_offset.dart';
 import 'package:flutter_samples/utils/k_means_util.dart';
 import 'package:flutter_samples/view_model/view_model.dart';
 import 'package:flutter_samples/widget/draw_point_widget.dart';
@@ -17,11 +18,26 @@ class KMeansViewModel extends ViewModel {
     Colors.green,
     Colors.amber,
     Colors.pink,
+    Colors.grey,
+    Colors.yellow,
+    Colors.blueGrey,
+    Colors.blueAccent,
+    Colors.yellowAccent,
   ];
 
   void run() {
-    final kmeans = KMeans(num: 5, points: points);
-    result = kmeans.caculate();
+    final ptList = points.map((e) => CustomOffset(pt: e)).toList();
+    final kmeans = KMeans(num: colorList.length, points: ptList);
+    result = kmeans.caculate().map(
+          (key, value) => MapEntry(
+            Offset(key.pt.dx, key.pt.dy),
+            value
+                .map(
+                  (e) => Offset(e.pt.dx, e.pt.dy),
+                )
+                .toList(),
+          ),
+        );
     //result = clusters.keys.map((e) => e).toList();
 
     notifyListeners();

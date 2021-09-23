@@ -4,7 +4,6 @@ import 'package:flutter_samples/view_model/k_means_view_model.dart';
 import 'package:flutter_samples/widget/draw_point_widget.dart';
 import 'package:provider/provider.dart';
 
-// ignore: must_be_immutable
 class KMeansPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
