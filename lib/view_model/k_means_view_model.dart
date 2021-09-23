@@ -38,7 +38,6 @@ class KMeansViewModel extends ViewModel {
                 .toList(),
           ),
         );
-    //result = clusters.keys.map((e) => e).toList();
 
     notifyListeners();
   }

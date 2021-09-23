@@ -66,15 +66,6 @@ class KMeans<T extends KMeansItem> {
 
   /// 从[clusters]提取结果
   void makeResult(Map<Uuid, Cluster<T>> clusters) {
-    // _result = clusters.entries
-    //     .map(
-    //       (c) => c.value.members
-    //           .map(
-    //             (m) => Offset(m.pt.dx, m.pt.dy),
-    //           )
-    //           .toList(),
-    //     )
-    //     .toList();
     clusters.entries.forEach((e) {
       _result[e.value.center] = e.value.members.map((m) => m.pt).toList();
     });
@@ -135,30 +126,11 @@ class KMeans<T extends KMeansItem> {
     return clusters;
   }
 
-  ///
-//   double _distance(Offset pt1, Offset pt2) {
-//     final xx = (double x) => x * x;
-//     return sqrt(xx(pt1.dx - pt2.dx) + xx(pt1.dy - pt2.dy));
-//   }
-
   /// 4. 选出新的质心
   Map<Uuid, Cluster<T>> regrouping(Map<Uuid, Cluster<T>> clusters) {
     Map<Uuid, Cluster<T>> newClusters = {};
     clusters.forEach(
       (key, c) {
-        // double dx = 0.0;
-        // double dy = 0.0;
-
-        // c.members.forEach((m) {
-        //   dx += m.pt.dx;
-        //   dy += m.pt.dy;
-        // });
-        // newClusters[key] = Cluster(
-        //   Offset(
-        //     dx / c.members.length,
-        //     dy / c.members.length,
-        //   ),
-        // );
         newClusters[key] =
             Cluster(c.center.average(c.members.map((e) => e.pt).toList()));
       },
@@ -188,21 +160,6 @@ class Cluster<T extends KMeansItem> {
   void add(Member<T> menber) {
     members.add(menber);
   }
-
-//   /// 用所有成员xy的平均值，计算出新的中心点
-//   T caculateAveragePoint() {
-//     return Offset(0, 0);
-//   }
-
-//   int maxMember() {
-//     int xx = 0;
-//     members.forEach((m) {
-//       if (m.id > xx) {
-//         xx = m.id;
-//       }
-//     });
-//     return xx;
-//   }
 
   bool compare(Cluster<T> cluster) {
     if (members.length != cluster.members.length) {
