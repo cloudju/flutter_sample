@@ -1,6 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter_samples/utils/custom_offset.dart';
 import 'package:flutter_samples/utils/k_means_util.dart';
 import 'package:flutter_samples/view_model/view_model.dart';
 import 'package:flutter_samples/widget/draw_point_widget.dart';
@@ -26,18 +27,16 @@ class KMeansViewModel extends ViewModel {
   ];
 
   void run() {
-    final ptList = points.map((e) => CustomOffset(pt: e)).toList();
-    final kmeans = KMeans(num: colorList.length, points: ptList);
-    result = kmeans.caculate().map(
-          (key, value) => MapEntry(
-            Offset(key.pt.dx, key.pt.dy),
-            value
-                .map(
-                  (e) => Offset(e.pt.dx, e.pt.dy),
-                )
-                .toList(),
-          ),
-        );
+    final kmeans = KMeans<Offset, Offset>(
+      data: points,
+      num: colorList.length,
+      caculateDistance: caculateDistance,
+      compare: compare,
+      caculateCenter: caculateCenter,
+      convert: convert,
+    );
+    final tmp = kmeans.caculate();
+    result = tmp;
 
     notifyListeners();
   }
@@ -74,4 +73,26 @@ class KMeansViewModel extends ViewModel {
     result = null;
     notifyListeners();
   }
+
+  double caculateDistance(Offset m, Offset c) {
+    final ss = (x) => x * x;
+    return sqrt(ss(m.dx - c.dx) + ss(m.dy - c.dy));
+  }
+
+  final compare = (Offset p1, Offset p2) => p1.dx.compareTo(p2.dx) == 0
+      ? p1.dy.compareTo(p2.dy)
+      : p1.dx.compareTo(p2.dx);
+
+  Offset caculateCenter(List<Offset> list) {
+    var dx = 0.0;
+    var dy = 0.0;
+    list.forEach((e) {
+      dx += e.dx;
+      dy += e.dy;
+    });
+
+    return Offset(dx / list.length, dy / list.length);
+  }
+
+  Offset convert(Offset p) => p;
 }
