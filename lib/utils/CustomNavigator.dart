@@ -34,8 +34,8 @@ class CustomNavigator {
 
   Route _createRoute(Widget page) {
     return PageRouteBuilder(
-      transitionDuration: Duration(seconds: 1),
-      reverseTransitionDuration: Duration(seconds: 2),
+      transitionDuration: Duration(milliseconds: 500),
+      reverseTransitionDuration: Duration(milliseconds: 500),
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(-1.0, 0.0);
