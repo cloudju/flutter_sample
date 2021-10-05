@@ -1,3 +1,6 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_samples/service/home_page_service.dart';
 import 'package:flutter_samples/service/service.dart';
@@ -5,12 +8,22 @@ import 'package:flutter_samples/view/home_page.dart';
 import 'package:flutter_samples/view_model/home_page_view_model.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp().then(
+    (value) =>
+        print('!!!!!!!!!Firebase.initializeApp();=>$value!!!!!!!!!!!!!!!!!'),
+  );
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -33,6 +46,7 @@ class MyApp extends StatelessWidget {
           // is not restarted.
           primarySwatch: Colors.blue,
         ),
+        navigatorObservers: <NavigatorObserver>[observer],
         home: ChangeNotifierProvider(
           create: (context) => HomePageViewModel(
             services: [

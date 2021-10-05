@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_samples/view_model/home_page_view_model.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    FirebaseAnalytics().setCurrentScreen(screenName: 'MyHomePage');
+    print('FirebaseAnalytics().setCurrentScreen(screenName: MyHomePage);');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),

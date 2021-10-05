@@ -32,6 +32,10 @@ dependencies:
 
   uuid: ^3.0.4
 
+  # for firebase
+  firebase_core: ^1.7.0
+  firebase_analytics: ^8.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
