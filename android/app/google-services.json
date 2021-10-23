@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:937371420954:android:7a895e797a2b13aa5084a3",
         "android_client_info": {
-          "package_name": "com.example.flutter_samples"
+          "package_name": "org.cloudju.flutter_samples"
         }
       },
       "oauth_client": [
