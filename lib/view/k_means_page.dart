@@ -10,7 +10,7 @@ class KMeansPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
-        top: false,
+        bottom: false,
         child: Center(
           child: Consumer<KMeansViewModel>(
             builder: _body,
@@ -22,9 +22,8 @@ class KMeansPage extends StatelessWidget {
 
   Widget _body(BuildContext context, KMeansViewModel viewModel, Widget? child) {
     final _width = MediaQuery.of(context).size.width;
-    final _height = MediaQuery.of(context).size.height -
-        kToolbarHeight -
-        MediaQuery.of(context).padding.vertical;
+    final _height =
+        MediaQuery.of(context).size.height - kToolbarHeight - kTextTabBarHeight;
     return Column(
       children: [
         Stack(
@@ -44,6 +43,7 @@ class KMeansPage extends StatelessWidget {
           ],
         ),
         Container(
+          height: _height * 0.1,
           child: Row(
             children: [
               Container(
