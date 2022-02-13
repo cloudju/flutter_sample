@@ -1,9 +1,9 @@
-import 'dart:math';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_samples/utils/k_means_util.dart';
+import 'package:flutter_samples/utils/k_means_albe.dart';
 import 'package:flutter_samples/view_model/view_model.dart';
-import 'package:flutter_samples/widget/draw_point_widget.dart';
+
+import '../utils/k_means_util2.dart';
 
 enum KmeansPlusStatus {
   input,
@@ -15,11 +15,80 @@ class KMeansPlusViewModel extends ViewModel {
 
   List<Offset> points = [];
 
+  KMeans<KMeansItem>? kmeans;
+
   KmeansPlusStatus status = KmeansPlusStatus.input;
 
   void caculate() {
+    final forK = points.map((e) => KMeansItem(e.dx, e.dy)).toList();
+
+    final sw = Stopwatch();
+    sw.start();
+
+    List<KMeans<KMeansItem>> resList = [];
+    for (int k = 2; k < 10; k++) {
+      final kmeans = KMeans<KMeansItem>(data: forK, k: k);
+      kmeans.caculate();
+      resList.add(kmeans);
+    }
+
+    List<double> sseList = resList.map((e) => e.sse).toList();
+
+    // sse的1阶导数
+    List<double> ssed1 = [0];
+    for (int i = 1; i < sseList.length; i++) {
+      ssed1.add((sseList[i - 1] - sseList[i]) / 2);
+    }
+    // sse的2阶导数
+    List<double> ssed2 = [0];
+    for (int i = 1; i < ssed1.length; i++) {
+      ssed2.add((ssed1[i - 1] - ssed1[i]) / 2);
+    }
+
+    var max = 0.0;
+    var index = 0;
+    for (var i = 1; i < ssed2.length; i++) {
+      if (ssed2[i] > max) {
+        max = ssed2[i];
+        index = i;
+      }
+    }
+
+    kmeans = resList[index];
+    sw.stop();
+    if (kDebugMode) {
+      print(
+          'i:$index,     ssed2:${ssed2.length},\tssed1:${ssed1.length},\tsseList:${sseList.length}');
+      for (int i = 0; i < sseList.length; i++) {
+        print(
+            'i:$i,     ssed2:${ssed2[i]},\tssed1:${ssed1[i]},\tsseList:${sseList[i]}');
+      }
+      print('used time:${sw.elapsed}');
+    }
+
     status = KmeansPlusStatus.result;
     notifyListeners();
+  }
+
+  List<DrawPointerable> kmResult(List<KMeansItem> list) {
+    List<DrawPointerable> pt = [];
+    for (var i = 0; i < list.length; i++) {
+      final color = colors[i % colors.length];
+      list[i].color = color.withAlpha(0x60);
+      list[i].sharp = Sharp.rect;
+      pt.add(list[i]);
+      for (final son in list[i].son) {
+        pt.add(KMeansItem(son.dx, son.dy, sharp: Sharp.circle, color: color));
+      }
+    }
+
+    return pt;
+
+    // return DrawPointWidget(
+    //   points: pt,
+    //   size: size,
+    //   origin: origin,
+    // );
   }
 
   Map<Offset, List<Offset>>? result;
@@ -37,73 +106,19 @@ class KMeansPlusViewModel extends ViewModel {
     Colors.yellowAccent,
   ];
 
-  void run() {
-    final kmeans = KMeans<Offset, Offset>(
-      data: points,
-      num: colorList.length,
-      caculateDistance: caculateDistance,
-      compare: compare,
-      caculateCenter: caculateCenter,
-      convert: convert,
-    );
-    final tmp = kmeans.caculate();
-    result = tmp;
-
-    notifyListeners();
-  }
-
-  Widget resultWigdet(Map<Offset, List<Offset>> data, Size size) {
-    final list = data.entries.map((e) => e.value).toList();
-
-    List<DrawPointWidget> widgets = [
-      DrawPointWidget(
-        size: size,
-        radius: 8,
-        points: data.entries.map((e) => e.key).toList(),
-        color: Colors.red,
-      ),
-    ];
-
-    for (int i = 0; i < list.length; i++) {
-      widgets.add(
-        DrawPointWidget(
-          size: size,
-          points: list[i],
-          color: colorList[i],
-        ),
-      );
-    }
-    return Stack(
-      children: widgets,
-    );
-  }
-
-  void clear() {
-    points.clear();
-    if (result != null) result!.clear();
-    result = null;
-    notifyListeners();
-  }
-
-  double caculateDistance(Offset m, Offset c) {
-    final ss = (x) => x * x;
-    return sqrt(ss(m.dx - c.dx) + ss(m.dy - c.dy));
-  }
-
-  final compare = (Offset p1, Offset p2) => p1.dx.compareTo(p2.dx) == 0
-      ? p1.dy.compareTo(p2.dy)
-      : p1.dx.compareTo(p2.dx);
-
-  Offset caculateCenter(List<Offset> list) {
-    var dx = 0.0;
-    var dy = 0.0;
-    list.forEach((e) {
-      dx += e.dx;
-      dy += e.dy;
-    });
-
-    return Offset(dx / list.length, dy / list.length);
-  }
-
-  Offset convert(Offset p) => p;
+  static const colors = [
+    Colors.black,
+    Colors.red,
+    Color.fromARGB(224, 203, 154, 5),
+    Color.fromARGB(255, 110, 255, 7),
+    Color.fromARGB(255, 7, 230, 255),
+    Color.fromARGB(255, 7, 98, 255),
+    Color.fromARGB(255, 160, 7, 255),
+    Color.fromARGB(255, 251, 7, 255),
+    Color.fromARGB(255, 225, 113, 149),
+    Color.fromARGB(255, 214, 255, 7),
+    Color.fromARGB(255, 255, 255, 7),
+    Color.fromARGB(255, 4, 112, 42),
+    Color.fromARGB(255, 47, 135, 172),
+  ];
 }

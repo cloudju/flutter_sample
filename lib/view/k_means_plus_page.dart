@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_samples/utils/CustomNavigator.dart';
-import 'package:flutter_samples/utils/k_means_albe.dart';
 import 'package:flutter_samples/view_model/k_means_plus_view_model.dart';
-import 'package:flutter_samples/view_model/view_model.dart';
 import 'package:flutter_samples/widget/draw_point_widget.dart';
 import 'package:flutter_samples/widget/draw_widget.dart';
 import 'package:provider/provider.dart';
@@ -35,22 +33,17 @@ class KMeansPlusPage extends StatelessWidget {
       case KmeansPlusStatus.input:
         return inpute(viewModel, Size(_width, _height));
       case KmeansPlusStatus.result:
-        return DrawWidget(
-          origin: Offset.zero,
-          points: viewModel.points
-              .map(
-                (e) => KMeansItem(
-                  e.dx,
-                  e.dy,
-                  color: Colors.red,
-                  sharp: Sharp.rect,
-                ),
-              )
-              .toList(),
-          size: Size(_width, _height),
-        );
+        return result(viewModel, Size(_width, _height));
     }
   }
+
+  Widget result(KMeansPlusViewModel vm, Size size) => vm.kmeans == null
+      ? Container()
+      : DrawWidget(
+          origin: Offset.zero,
+          points: vm.kmResult(vm.kmeans!.result),
+          size: size,
+        );
 
   Widget inpute(KMeansPlusViewModel vm, Size size) => Column(
         children: [
