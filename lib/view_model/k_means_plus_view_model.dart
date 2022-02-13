@@ -5,10 +5,22 @@ import 'package:flutter_samples/utils/k_means_util.dart';
 import 'package:flutter_samples/view_model/view_model.dart';
 import 'package:flutter_samples/widget/draw_point_widget.dart';
 
+enum KmeansPlusStatus {
+  input,
+  result,
+}
+
 class KMeansPlusViewModel extends ViewModel {
   String name = 'I am KMeansViewModel';
 
   List<Offset> points = [];
+
+  KmeansPlusStatus status = KmeansPlusStatus.input;
+
+  void caculate() {
+    status = KmeansPlusStatus.result;
+    notifyListeners();
+  }
 
   Map<Offset, List<Offset>>? result;
 
